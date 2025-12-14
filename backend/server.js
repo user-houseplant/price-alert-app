@@ -1,17 +1,19 @@
-// backend/server.js
 import express from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 import connectDB from "./config/db.js";
+
 import testRoutes from "./routes/testRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
-import cors from "cors";
 
 dotenv.config();
-const app = express();
 connectDB();
 
+const app = express();
+
+/* 🔴 BODY PARSER MUST COME BEFORE ROUTES */
 app.use(cors());
-app.use(express.json());
+app.use(express.json());   // ← THIS LINE IS CRITICAL
 
 app.use("/api/test", testRoutes);
 app.use("/api/products", productRoutes);
