@@ -1,152 +1,91 @@
-'use client';
-import { useEffect, useState } from 'react';
+"use client";
+
+import { useState } from "react";
+import Header from "../components/Header";
+import SearchBar from "../components/SearchBar";
+import ProductGrid from "../components/ProductGrid";
+import { ShoppingBag } from "lucide-react";
 
 type Product = {
-  _id: string;
   title: string;
-  source?: string;
-  price?: number;
-  url?: string;
+  price: number;
+  image: string;
+  link: string;
+  source: string;
+  badge?: string;
 };
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [input, setInput] = useState('');
-  const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
+  const [searched, setSearched] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch from backend when query changes
-  useEffect(() => {
-    async function fetchProducts() {
-      if (!query.trim()) {
-        setProducts([]);
-        return;
-      }
-
-      setLoading(true);
-      setError(null);
-
-      try {
-        const res = await fetch(
-          `http://localhost:5000/api/products?q=${encodeURIComponent(query)}`
-        );
-
-        if (!res.ok) {
-          throw new Error('Failed to fetch products');
-        }
-
-        const data: Product[] = await res.json();
-        setProducts(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchProducts();
-  }, [query]);
-
-  function handleSearch() {
-    setQuery(input.trim());
-  }
-
-  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === 'Enter') handleSearch();
-  }
-
-  function handleClear() {
-    setInput('');
-    setQuery('');
-    setProducts([]);
+  const handleSearch = async (query: string) => {
+    setLoading(true);
     setError(null);
-  }
+    setSearched(true);
+    setProducts([]);
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/search?query=${encodeURIComponent(query)}`);
+      if (!res.ok) throw new Error("Failed to fetch results");
+      const data = await res.json();
+      setProducts(data);
+    } catch (err) {
+      setError("Failed to fetch products. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <main className="min-h-screen bg-black text-white flex items-center justify-center">
-      <div className="max-w-2xl w-full px-6 py-10 border border-gray-700 rounded-2xl bg-zinc-900/70">
-        <h1 className="text-3xl font-semibold mb-2">
-          Price Comparison + Alert System
-        </h1>
+    <div className="min-h-screen flex flex-col items-center">
+      {/* Light subtle grain or mesh gradient */}
+      <div className="absolute inset-0 bg-white bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-50 pointer-events-none"></div>
 
-        <p className="text-sm text-gray-300 mb-6">
-          Search a product and compare prices across platforms.
-        </p>
+      <Header />
 
-        {/* Search Bar */}
-        <div className="flex gap-2 mb-6">
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            type="text"
-            placeholder="Search (eg. iPhone 15)"
-            className="flex-1 px-3 py-2 rounded-lg bg-black border border-gray-700 outline-none text-sm"
-          />
-          <button
-            onClick={handleSearch}
-            className="px-4 py-2 rounded-lg bg-indigo-500 text-sm font-medium"
-          >
-            Search
-          </button>
-          <button
-            onClick={handleClear}
-            className="px-3 py-2 rounded-lg bg-gray-700 text-sm text-gray-200"
-          >
-            Clear
-          </button>
+      <main className="flex-1 w-full flex flex-col items-center pt-10 sm:pt-20 gap-12 z-10">
+        <div className="text-center space-y-4 px-6 max-w-2xl">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#BFC7DE] bg-white text-[#2D2A32] text-xs font-bold mb-4 shadow-sm">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#E07A78] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#E07A78]"></span>
+            </span>
+            Real-time Price Tracking
+          </div>
+          <h2 className="text-4xl sm:text-6xl font-bold tracking-tight text-[#2D2A32] drop-shadow-sm">
+            Find the <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2D2A32] to-[#E07A78]">Lowest Price</span> instantly.
+          </h2>
+          <p className="text-[#2D2A32]/80 text-lg font-medium leading-relaxed">
+            Compare prices across Amazon and Flipkart in one click. Stop overpaying for your favorite tech.
+          </p>
         </div>
 
-        {/* Results */}
-        <div className="border border-dashed border-gray-600 rounded-lg p-4 text-sm text-gray-300">
-          {loading && <div>Loading products…</div>}
-
-          {error && <div className="text-red-400">{error}</div>}
-
-          {!loading && !error && query && products.length === 0 && (
-            <div>No products found for "{query}".</div>
-          )}
-
-          {!loading && !error && !query && (
-            <div>Type a product name and press Search or Enter.</div>
-          )}
-
-          {!loading && !error && products.length > 0 && (
-            <ul className="space-y-3">
-              {products.map((p) => (
-                <li key={p._id} className="p-3 bg-black/40 rounded-md">
-                  <div className="flex justify-between gap-4">
-                    <div>
-                      <div className="font-medium">{p.title}</div>
-                      {p.source && (
-                        <div className="text-xs text-gray-400">
-                          {p.source}
-                        </div>
-                      )}
-                    </div>
-                    <div className="text-right">
-                      <div className="font-semibold">
-                        ₹{p.price ?? '—'}
-                      </div>
-                      {p.url && (
-                        <a
-                          href={p.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-xs text-indigo-300 underline"
-                        >
-                          View
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
+        <div className="w-full px-6">
+          <SearchBar onSearch={handleSearch} isLoading={loading} />
         </div>
-      </div>
-    </main>
+
+        {error && (
+          <div className="text-red-400 bg-red-500/10 px-4 py-2 rounded-lg border border-red-500/20">
+            {error}
+          </div>
+        )}
+
+        {!loading && searched && products.length === 0 && !error && (
+          <div className="flex flex-col items-center justify-center text-gray-500 py-20">
+            <ShoppingBag className="w-12 h-12 mb-4 opacity-20" />
+            <p>No products found. Try a different search term.</p>
+          </div>
+        )}
+
+        <ProductGrid products={products} />
+      </main>
+
+      <footer className="py-8 text-center text-gray-600 text-sm">
+        <p>&copy; {new Date().getFullYear()} PriceWise. Built for savvy shoppers.</p>
+      </footer>
+    </div>
   );
 }

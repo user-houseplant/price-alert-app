@@ -1,0 +1,26 @@
+import ProductCard from "./ProductCard";
+
+type Product = {
+    title: string;
+    price: number;
+    image: string;
+    link: string;
+    source: string;
+    badge?: string;
+};
+
+type ProductGridProps = {
+    products: Product[];
+};
+
+export default function ProductGrid({ products }: ProductGridProps) {
+    if (products.length === 0) return null;
+
+    return (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full max-w-7xl mx-auto px-6 pb-20">
+            {products.map((product, idx) => (
+                <ProductCard key={`${product.source}-${idx}`} {...product} />
+            ))}
+        </div>
+    );
+}

@@ -1,8 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* User Palette - Enhanced for Contrast */
+  --sky-blue: #C7DBF7;
+  --cloud-lavender: #BFC7DE;
+  --slate-purple: #75708C;
+  /* Kept for subtle borders/secondary text */
+  --deep-slate: #2D2A32;
+  /* New Primary Text */
+  --vibrant-coral: #E07A78;
+  /* New Vibrant Accent */
+
+  --background: #f8fafc;
+  --foreground: #2D2A32;
+  /* Much darker text */
+  /* Slate Purple Text */
+
+  --primary: #2D2A32;
+  --accent: #E07A78;
 }
 
 @theme inline {
@@ -12,15 +27,48 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+body {
+  /* Soft gradient background matching reference */
+  background: linear-gradient(135deg, #C7DBF7 0%, #BFC7DE 50%, #fce7e6 100%);
+  color: var(--foreground);
+  font-family: var(--font-sans), sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2D2A32;
+  border-radius: 4px;
+  opacity: 0.7;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #1a181e;
+}
+
+/* Glassmorphism Utilities */
+.glass {
+  background: rgba(255, 255, 255, 0.4);
+  /* Softer glass */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+}
+
+.glass-hover:hover {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(255, 255, 255, 0.8);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.1);
 }
